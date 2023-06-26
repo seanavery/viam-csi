@@ -1,0 +1,11 @@
+ARG TAG
+ARG APPIMAGE
+FROM nvcr.io/nvidia/l4t-base:${TAG}
+
+ENV HOME /root
+
+RUN apt-get -y update
+RUN apt install -y libfuse-dev
+
+# Copy appimage/binary
+ADD ../bin /usr/bin

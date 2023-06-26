@@ -1,0 +1,109 @@
+ARG TAG
+FROM nvcr.io/nvidia/l4t-base:${TAG}
+
+RUN apt-get -y update
+
+# Install viam-cpp-sdk
+# reference: https://github.com/viamrobotics/viam-cpp-sdk
+# TODO: comply with license https://github.com/viamrobotics/viam-cpp-sdk/blob/main/LICENSE
+RUN apt-get -y --no-install-recommends install \
+    build-essential \
+    ca-certificates \
+    curl \
+    doxygen \
+    g++ \
+    gdb \
+    git \
+    gnupg \
+    gpg \
+    less \
+    libboost-all-dev \
+    libc-ares-dev \
+    libre2-dev \
+    libssl-dev \
+    ninja-build \
+    pkg-config \
+    software-properties-common \
+    sudo \
+    wget \
+    zlib1g-dev
+
+RUN bash -c 'wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -'
+RUN apt-add-repository -y 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main'
+
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - > /usr/share/keyrings/kitware-archive-keyring.gpg
+RUN echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' > /etc/apt/sources.list.d/kitware.list
+
+RUN apt-get update
+
+RUN apt-get -y --no-install-recommends install -t llvm-toolchain-focal-15 \
+    clang-15 \
+    clang-tidy-15
+
+RUN apt-get -y install cmake
+
+RUN mkdir -p ${HOME}/opt/src
+
+RUN cd ${HOME}/opt/src && \
+    git clone --recurse-submodules -b v1.52.0 --depth 1 --shallow-submodules https://github.com/grpc/grpc && \
+    cd grpc && \
+    mkdir -p build && \
+    cd build && \
+    cmake .. -G Ninja \
+        -DgRPC_ZLIB_PROVIDER=package \
+        -DgRPC_CARES_PROVIDER=package \
+        -DgRPC_RE2_PROVIDER=package \
+        -DgRPC_SSL_PROVIDER=package \
+        -DgRPC_INSTALL=ON \
+        -DgRPC_BUILD_TESTS=OFF \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_INSTALL_RPATH=/usr/local/lib && \
+    ninja install && \
+    cd .. && \
+    rm -rf build
+
+RUN cd ${HOME}/opt/src && \
+    git clone https://github.com/viamrobotics/viam-cpp-sdk && \
+    cd viam-cpp-sdk && \
+    mkdir build && \
+    cd build && \
+    cmake  -DVIAMCPPSDK_USE_DYNAMIC_PROTOS=ON -DVIAMCPPSDK_OFFLINE_PROTO_GENERATION=ON .. -G Ninja  && \
+    ninja install -j1
+
+
+# install appimage-builder
+RUN apt install -y \
+    binutils \
+    coreutils \
+    desktop-file-utils \
+    fakeroot \
+    fuse \
+    libgdk-pixbuf2.0-dev \
+    patchelf \
+    python3-pip python3-setuptools \
+    squashfs-tools \
+    strace \
+    util-linux zsync
+
+RUN pip3 install -U pip setuptools urllib3==1.26.12 requests==2.26.0
+
+# install appimage-builder
+RUN cd ${HOME}/opt/src && \
+    git clone https://github.com/AppImageCrafters/appimage-builder.git && \
+    cd appimage-builder && \
+    pip3 install ./
+
+# install viam-csi
+RUN cp -r ${HOME}/opt/src/viam-cpp-sdk/build/install/* /usr/local/
+# install dev files
+RUN apt-get -y install gstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+
+RUN apt-get -y install libfuse-dev
+
+ADD ../ ${HOME}/opt/src/viam-csi
+RUN cd ${HOME}/opt/src && \
+    cd viam-csi  && \
+    make build && \
+    make package
