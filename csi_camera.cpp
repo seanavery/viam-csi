@@ -36,8 +36,8 @@ class CSICamera : public Camera {
                 std::shared_ptr<ProtoType> width_proto = attrs->at("width_px");
                 auto width_value = width_proto->proto_value();
                 if (width_value.has_number_value()) {
-                    int height_num = static_cast<int>(width_value.number_value());
-                    width_px = height_num;
+                    int width_num = static_cast<int>(width_value.number_value());
+                    width_px = width_num;
                 }
             }
             if (!width_px) {
