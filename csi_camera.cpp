@@ -33,6 +33,19 @@ class CSICamera : public Camera {
     public:
         explicit CSICamera(std::string name, AttributeMap attrs) : Camera(std::move(name)) {
             // Validate attributes
+            validate_attrs(attrs);
+
+            // Create GST pipeline
+            std::string pipeline_args = create_pipeline();
+            if (debug) {
+                std::cout << "pipeline_args: " << pipeline_args << std::endl;
+            }
+            
+            // Start GST pipeline
+            csi_init(pipeline_args);
+        }
+
+        void validate_attrs(AttributeMap attrs) {
             if (attrs->count("width_px") == 1) {
                 std::shared_ptr<ProtoType> width_proto = attrs->at("width_px");
                 auto width_value = width_proto->proto_value();
@@ -97,6 +110,18 @@ class CSICamera : public Camera {
                     debug = debug_bool;
                 }
             }
+        }
+
+
+        // OVERRIDE
+
+        void reconfigure(Dependencies deps, ResourceConfig cfg) override {
+            // Stop gst pipeline
+            stop_pipeline();
+
+            // Update attributes
+            auto attrs = cfg.attributes();
+            validate_attrs(attrs);
 
             // Create GST pipeline
             std::string pipeline_args = create_pipeline();
@@ -108,7 +133,6 @@ class CSICamera : public Camera {
             csi_init(pipeline_args);
         }
 
-        // OVERRIDE
         raw_image get_image(std::string mime_type) override {
             if (debug) {
                 std::cout << "hit get_image. expecting mime_type " << mime_type << std::endl;
@@ -222,6 +246,26 @@ class CSICamera : public Camera {
             return;
         }
         
+        void stop_pipeline() {
+            // Stop the pipeline
+            if (gst_element_set_state(pipeline, GST_STATE_NULL) == GST_STATE_CHANGE_FAILURE) {
+                std::cerr << "Failed to stop the pipeline" << std::endl;
+                gst_object_unref(appsink);
+                gst_object_unref(pipeline);
+                std::exit(EXIT_FAILURE);
+            }
+
+            wait_pipeline();
+
+            // Free resources
+            gst_object_unref(appsink);
+            gst_object_unref(pipeline);
+            gst_object_unref(bus);
+            g_source_remove(bus_watch_id);
+
+            return;
+        }
+        
         // Handles GST pipeline errors
         static gboolean catch_pipeline(GstBus *_bus, GstMessage *message, gpointer user_data) {
                 GError *err = NULL;
@@ -266,6 +310,7 @@ class CSICamera : public Camera {
         }
 
         // UTILS 
+
         std::string create_pipeline() {
             std::ostringstream oss;
 
