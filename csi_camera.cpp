@@ -22,6 +22,7 @@ class CSICamera : public Camera {
         bool debug;
 
         // Gstreamer attributes
+        guint bus_watch_id;
         GstElement *pipeline = nullptr;
         GstBus *bus = nullptr;
         GstMessage *msg = nullptr;
@@ -184,13 +185,20 @@ class CSICamera : public Camera {
 
             // Run the main loop
             bus = gst_element_get_bus(pipeline);
+            if (!bus) {
+                std::cerr << "Failed to get the bus for the pipeline" << std::endl;
+                gst_object_unref(appsink);
+                gst_object_unref(pipeline);
+                std::exit(EXIT_FAILURE);
+            }
 
-            // Handle pipeline errors
-
+            // Watch for GST errors
+            bus_watch_id = gst_bus_add_watch(bus, (GstBusFunc)catch_pipeline, nullptr);
+            
             return;
         }
 
-        // Handles errors from async GST state change
+        // Handles async GST state change
         void wait_pipeline() {
             GstState state, pending;
             GstStateChangeReturn ret;
@@ -210,7 +218,24 @@ class CSICamera : public Camera {
                 std::cerr << "GST pipeline failed to start" << std::endl;
                 std::exit(EXIT_FAILURE);
             }
+
             return;
+        }
+        
+        // Handles GST pipeline errors
+        static gboolean catch_pipeline(GstBus *_bus, GstMessage *message, gpointer user_data) {
+                GError *err = NULL;
+                gchar *debug_info = NULL;
+
+                gst_message_parse_error(message, &err, &debug_info);
+                std::cerr << "Error received from element " << GST_OBJECT_NAME(message->src) << ": " << err->message << std::endl;
+                std::cerr << "Debugging information: " << (debug_info ? debug_info : "none") << std::endl;
+
+                g_error_free(err);
+                g_free(debug_info);
+
+                // Return TRUE to stop further processing of the message
+                return TRUE; 
         }
 
         std::vector<unsigned char> csi_get_image() {
