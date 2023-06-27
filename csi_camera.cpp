@@ -41,7 +41,7 @@ class CSICamera : public Camera {
                 }
             }
             if (!width_px) {
-                std::cerr << "ERROR: width_px attribute not found" << std::endl;
+                std::cout << "ERROR: width_px attribute not found" << std::endl;
                 std::cout << "Setting width_px to default value: " << DEFAULT_INPUT_WIDTH << std::endl;
                 width_px = DEFAULT_INPUT_WIDTH;
             }
@@ -55,7 +55,7 @@ class CSICamera : public Camera {
                 }
             }
             if (!height_px) {
-                std::cerr << "ERROR: height_px attribute not found" << std::endl;
+                std::cout << "ERROR: height_px attribute not found" << std::endl;
                 std::cout << "Setting height_px to default value: " << DEFAULT_INPUT_HEIGHT << std::endl;
                 height_px = DEFAULT_INPUT_HEIGHT;
             }
@@ -69,7 +69,7 @@ class CSICamera : public Camera {
                 }
             }
             if (!frame_rate) {
-                std::cerr << "ERROR: frame_rate attribute not found" << std::endl;
+                std::cout << "ERROR: frame_rate attribute not found" << std::endl;
                 std::cout << "Setting frame_rate to default value: " << DEFAULT_INPUT_SENSOR<< std::endl;
                 frame_rate = DEFAULT_INPUT_FRAMERATE;
             }
@@ -82,8 +82,8 @@ class CSICamera : public Camera {
                     video_path = video_str;
                 }
             }
-            if (video_path.empty()) {
-                std::cerr << "ERROR: video_path attribute not found" << std::endl;
+            if (video_path.empty() ) {
+                std::cout << "ERROR: video_path attribute not found" << std::endl;
                 std::cout << "Setting video_path to default value: " << DEFAULT_INPUT_SOURCE << std::endl;
                 video_path = DEFAULT_INPUT_SENSOR;
             }
@@ -179,13 +179,35 @@ class CSICamera : public Camera {
                 std::exit(EXIT_FAILURE);
             }
 
+            // Handle async errors
+            catch_pipeline();
+
             // Run the main loop
             bus = gst_element_get_bus(pipeline);
 
-            if (debug) {
-                std::cout << "G DEFAULTpipeline is running" << std::endl;
+            return;
+        }
+
+        // Handles errors from async GST state change
+        void catch_pipeline() {
+            GstState state, pending;
+            GstStateChangeReturn ret;
+            // while (gst_element_get_state(pipeline, &state, &pending, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_ASYNC) {
+            while ((ret = gst_element_get_state(pipeline, &state, &pending, GST_CLOCK_TIME_NONE)) == GST_STATE_CHANGE_ASYNC) {
+                // wait for state change to complete
             }
 
+            if (ret == GST_STATE_CHANGE_SUCCESS) {
+                std::cout << "GST pipeline started" << std::endl;
+            } else if (ret == GST_STATE_CHANGE_FAILURE) {
+                std::cerr << "GST pipeline failed to start" << std::endl;
+                std::exit(EXIT_FAILURE);
+            } else if (ret = GST_STATE_CHANGE_NO_PREROLL) {
+                std::cout << "GST pipeline started but not enough data for preroll" << std::endl;
+            } else {
+                std::cerr << "GST pipeline failed to start" << std::endl;
+                std::exit(EXIT_FAILURE);
+            }
             return;
         }
 
@@ -220,7 +242,7 @@ class CSICamera : public Camera {
         std::string create_pipeline() {
             std::ostringstream oss;
 
-            oss << DEFAULT_INPUT_SOURCE << " sensor_id=" << DEFAULT_INPUT_SENSOR
+            oss << DEFAULT_INPUT_SOURCE << " sensor_id=" << video_path
                 << " ! " << DEFAULT_INPUT_FORMAT
                 << ",width=" << std::to_string(width_px)
                 << ",height=" << std::to_string(height_px)
