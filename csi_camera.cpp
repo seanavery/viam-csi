@@ -103,7 +103,7 @@ class CSICamera : public Camera {
                 std::cout << "pipeline_args: " << pipeline_args << std::endl;
             }
 
-            // Start G DEFAULTpipeline
+            // Start GST pipeline
             csi_init(pipeline_args);
         }
 
@@ -148,7 +148,7 @@ class CSICamera : public Camera {
             return properties{};
         };
 
-        // DEFAULTG
+        // GST
         void csi_init(std::string pipeline_args) {
             // Build gst pipeline
             pipeline = gst_parse_launch(
@@ -179,17 +179,19 @@ class CSICamera : public Camera {
                 std::exit(EXIT_FAILURE);
             }
 
-            // Handle async errors
-            catch_pipeline();
+            // Handle async pipeline creation
+            wait_pipeline();
 
             // Run the main loop
             bus = gst_element_get_bus(pipeline);
+
+            // Handle pipeline errors
 
             return;
         }
 
         // Handles errors from async GST state change
-        void catch_pipeline() {
+        void wait_pipeline() {
             GstState state, pending;
             GstStateChangeReturn ret;
             // while (gst_element_get_state(pipeline, &state, &pending, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_ASYNC) {
