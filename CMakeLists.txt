@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(csi-mr
-        VERSION 0.0.0
+        VERSION 0.0.1
         DESCRIPTION "CSI camera modular resource"
 ) 
 
@@ -11,13 +11,6 @@ find_package(PkgConfig) # finding pkg-config is a helper tool
 # finding cpp sdk
 set(CMAKE_PREFIX_PATH "/home/viam/viam-cpp-sdk/build/install" ${CMAKE_PREFIX_PATH})
 find_package(viam-cpp-sdk CONFIG REQUIRED)
-
-# finding rust utils
-# set(RUST_UTILS_PATH="/home/viam/viam-cpp-sdk/build/")
-# find_library(
-#         viam_rust_utils libviam_rust_utils.so 
-#         PATHS ${RUST_UTILS_PATH}
-# )
 
 # using pkg-config to getting Gstreamer
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-app-1.0 gstreamer-base-1.0)
