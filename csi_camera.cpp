@@ -42,8 +42,8 @@ class CSICamera : public Camera {
             }
             if (!width_px) {
                 std::cerr << "ERROR: width_px attribute not found" << std::endl;
-                std::cout << "Setting width_px to default value: " << STREAMER_INPUT_WIDTH << std::endl;
-                width_px = STREAMER_INPUT_WIDTH;
+                std::cout << "Setting width_px to default value: " << DEFAULT_INPUT_WIDTH << std::endl;
+                width_px = DEFAULT_INPUT_WIDTH;
             }
                 
             if (attrs->count("height_px") == 1) {
@@ -56,8 +56,8 @@ class CSICamera : public Camera {
             }
             if (!height_px) {
                 std::cerr << "ERROR: height_px attribute not found" << std::endl;
-                std::cout << "Setting height_px to default value: " << STREAMER_INPUT_HEIGHT << std::endl;
-                height_px = STREAMER_INPUT_HEIGHT;
+                std::cout << "Setting height_px to default value: " << DEFAULT_INPUT_HEIGHT << std::endl;
+                height_px = DEFAULT_INPUT_HEIGHT;
             }
             
             if (attrs->count("frame_rate") == 1) {
@@ -70,8 +70,8 @@ class CSICamera : public Camera {
             }
             if (!frame_rate) {
                 std::cerr << "ERROR: frame_rate attribute not found" << std::endl;
-                std::cout << "Setting frame_rate to default value: " << STREAMER_INPUT_SENSOR<< std::endl;
-                frame_rate = STREAMER_INPUT_FRAMERATE;
+                std::cout << "Setting frame_rate to default value: " << DEFAULT_INPUT_SENSOR<< std::endl;
+                frame_rate = DEFAULT_INPUT_FRAMERATE;
             }
             
             if (attrs->count("video_path") == 1) {
@@ -84,8 +84,8 @@ class CSICamera : public Camera {
             }
             if (video_path.empty()) {
                 std::cerr << "ERROR: video_path attribute not found" << std::endl;
-                std::cout << "Setting video_path to default value: " << STREAMER_INPUT_SOURCE << std::endl;
-                video_path = STREAMER_INPUT_SENSOR;
+                std::cout << "Setting video_path to default value: " << DEFAULT_INPUT_SOURCE << std::endl;
+                video_path = DEFAULT_INPUT_SENSOR;
             }
 
             if (attrs->count("debug") == 1) {
@@ -97,13 +97,13 @@ class CSICamera : public Camera {
                 }
             }
 
-            // Create Gstreamer pipeline
+            // Create GST pipeline
             std::string pipeline_args = create_pipeline();
             if (debug) {
                 std::cout << "pipeline_args: " << pipeline_args << std::endl;
             }
 
-            // Start Gstreamer pipeline
+            // Start G DEFAULTpipeline
             csi_init(pipeline_args);
         }
 
@@ -113,7 +113,7 @@ class CSICamera : public Camera {
                 std::cout << "hit get_image. expecting mime_type " << mime_type << std::endl;
             }
             raw_image image;
-            image.mime_type = STREAMER_OUTPUT_MIMETYPE;
+            image.mime_type = DEFAULT_OUTPUT_MIMETYPE;
             if (FAKE_CAMERA) {
                 image.bytes = get_test_image();
                 return image;
@@ -148,7 +148,7 @@ class CSICamera : public Camera {
             return properties{};
         };
 
-        // GSTREAMER
+        // DEFAULTG
         void csi_init(std::string pipeline_args) {
             // Build gst pipeline
             pipeline = gst_parse_launch(
@@ -183,7 +183,7 @@ class CSICamera : public Camera {
             bus = gst_element_get_bus(pipeline);
 
             if (debug) {
-                std::cout << "Gstreamer pipeline is running" << std::endl;
+                std::cout << "G DEFAULTpipeline is running" << std::endl;
             }
 
             return;
@@ -210,7 +210,7 @@ class CSICamera : public Camera {
                 std::cout << "end of stream received" << std::endl;
                 gst_message_unref(msg);
                 // Exit process when EOS message is received
-                std::exit(EXIT_FAILURE);
+                std::exit(EXIT_SUCCESS);
             }
 
             return vec;
@@ -220,17 +220,17 @@ class CSICamera : public Camera {
         std::string create_pipeline() {
             std::ostringstream oss;
 
-            oss << STREAMER_INPUT_SOURCE << " sensor_id=" << STREAMER_INPUT_SENSOR
-                << " ! " << STREAMER_INPUT_FORMAT
+            oss << DEFAULT_INPUT_SOURCE << " sensor_id=" << DEFAULT_INPUT_SENSOR
+                << " ! " << DEFAULT_INPUT_FORMAT
                 << ",width=" << std::to_string(width_px)
                 << ",height=" << std::to_string(height_px)
                 << ",framerate=" << std::to_string(frame_rate)
-                << "/1 ! nvvidconv flip-method=" << STREAMER_INPUT_FLIP_METHOD
-                << " ! " << STREAMER_OUTPUT_FORMAT
-                << ",width=" << std::to_string(STREAMER_OUTPUT_WIDTH)
-                << ",height=" << std::to_string(STREAMER_OUTPUT_HEIGHT)
-                << " ! " << STREAMER_OUTPUT_ENCODER
-                << " ! " << STREAMER_OUTPUT_MIMETYPE
+                << "/1 ! nvvidconv flip-method=" << DEFAULT_INPUT_FLIP_METHOD
+                << " ! " << DEFAULT_OUTPUT_FORMAT
+                << ",width=" << std::to_string(DEFAULT_OUTPUT_WIDTH)
+                << ",height=" << std::to_string(DEFAULT_OUTPUT_HEIGHT)
+                << " ! " << DEFAULT_OUTPUT_ENCODER
+                << " ! " << DEFAULT_OUTPUT_MIMETYPE
                 << " ! appsink max-buffers=1";
 
             return oss.str();
