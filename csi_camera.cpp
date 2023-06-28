@@ -12,6 +12,7 @@
 #include <viam/sdk/components/camera/camera.hpp>
 #include <viam/api/component/camera/v1/camera.grpc.pb.h>
 
+
 using namespace viam::sdk;
 
 class CSICamera : public Camera {
@@ -24,7 +25,6 @@ class CSICamera : public Camera {
         bool debug;
 
         // GST attributes
-        guint bus_watch_id;
         GstElement *pipeline = nullptr;
         GstBus *bus = nullptr;
         GstMessage *msg = nullptr;
@@ -114,7 +114,6 @@ class CSICamera : public Camera {
             }
         }
 
-
         // OVERRIDE
 
         void reconfigure(Dependencies deps, ResourceConfig cfg) override {
@@ -193,7 +192,9 @@ class CSICamera : public Camera {
             }
 
             // Print pipeline structure
-            // GST_DEBUG_BIN_TO_DOT_FILE(GST_BIN(pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "pipeline_structure");
+            if (debug) {
+                GST_DEBUG_BIN_TO_DOT_FILE(GST_BIN(pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "pipeline_structure");
+            }
             
             // Fetch the appsink element
             appsink = gst_bin_get_by_name(GST_BIN(pipeline), "appsink0");
@@ -202,9 +203,6 @@ class CSICamera : public Camera {
                 gst_object_unref(pipeline);
                 std::exit(EXIT_FAILURE);
             }
-
-            // Set the appsink to emit signal
-            g_object_set(appsink, "emit-signals", TRUE, NULL);
 
             // Start the pipeline
             if (gst_element_set_state(pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
@@ -226,9 +224,6 @@ class CSICamera : public Camera {
                 std::exit(EXIT_FAILURE);
             }
 
-            // Watch for GST errors
-            bus_watch_id = gst_bus_add_watch(bus, (GstBusFunc)catch_pipeline, nullptr);
-            
             return;
         }
 
@@ -269,13 +264,13 @@ class CSICamera : public Camera {
                 std::exit(EXIT_FAILURE);
             }
 
+            // Wait for async state change
             wait_pipeline();
 
             // Free resources
             gst_object_unref(appsink);
             gst_object_unref(pipeline);
             gst_object_unref(bus);
-            g_source_remove(bus_watch_id);
             appsink = nullptr;
             pipeline = nullptr;
             bus = nullptr;
@@ -283,20 +278,48 @@ class CSICamera : public Camera {
             return;
         }
         
-        // Handles GST pipeline errors
-        static gboolean catch_pipeline(GstBus *_bus, GstMessage *message, gpointer user_data) {
-                GError *err = NULL;
-                gchar *debug_info = NULL;
+        void catch_pipeline() {
+            GError* error = nullptr;
+            gchar* debugInfo = nullptr;
 
-                gst_message_parse_error(message, &err, &debug_info);
-                std::cerr << "Error received from element " << GST_OBJECT_NAME(message->src) << ": " << err->message << std::endl;
-                std::cerr << "Debugging information: " << (debug_info ? debug_info : "none") << std::endl;
+            switch (GST_MESSAGE_TYPE(msg)) {
+                case GST_MESSAGE_ERROR:
+                    gst_message_parse_error(msg, &error, &debugInfo);
+                    std::cerr << "Error: " << error->message << std::endl;
+                    std::cerr << "Debug Info: " << debugInfo << std::endl;
+                    stop_pipeline();
+                    std::exit(EXIT_FAILURE);
+                    break;
+                case GST_MESSAGE_EOS:
+                    std::cout << "End of stream received" << std::endl;
+                    // Stop the pipeline
+                    stop_pipeline();
+                    std::exit(EXIT_SUCCESS);
+                    break;
+                case GST_MESSAGE_WARNING:
+                    gst_message_parse_warning(msg, &error, &debugInfo);
+                    if (debug) {
+                        std::cout << "Warning: " << error->message << std::endl;
+                        std::cout << "Debug Info: " << debugInfo << std::endl;
+                    }
+                    break;
+                case GST_MESSAGE_INFO:
+                    gst_message_parse_info(msg, &error, &debugInfo);
+                    if (debug) {
+                        std::cout << "Info: " << error->message << std::endl;
+                        std::cout << "Debug Info: " << debugInfo << std::endl;
+                    }
+                    break;
+                default:
+                    // Ignore other message types
+                    break;
+            }
 
-                g_error_free(err);
-                g_free(debug_info);
-
-                // Return TRUE to stop further processing of the message
-                return TRUE; 
+            // Cleanup
+            if (error != nullptr)
+                g_error_free(error);
+            if (debugInfo != nullptr)
+                g_free(debugInfo);
         }
 
         std::vector<unsigned char> csi_get_image() {
@@ -315,12 +338,19 @@ class CSICamera : public Camera {
             }
 
             // Check for EOS message
-            msg = gst_bus_pop_filtered(bus, GST_MESSAGE_EOS);
+            // msg = gst_bus_pop_filtered(bus, GST_MESSAGE_EOS);
+            // if (msg != nullptr) {
+            //     std::cout << "end of stream received" << std::endl;
+            //     gst_message_unref(msg);
+            //     // Exit process when EOS message is received
+            //     std::exit(EXIT_SUCCESS);
+            // }
+
+            msg = gst_bus_pop(bus);
             if (msg != nullptr) {
-                std::cout << "end of stream received" << std::endl;
-                gst_message_unref(msg);
-                // Exit process when EOS message is received
-                std::exit(EXIT_SUCCESS);
+                catch_pipeline();
+                gst_message_unref(msg); // Unreference the message
+                msg = nullptr;
             }
 
             return vec;
