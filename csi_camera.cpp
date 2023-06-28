@@ -2,6 +2,8 @@
 #include <fstream>
 #include <cstring>
 #include <sstream>
+#include <thread>
+#include <chrono>
 
 #include "constraints.h"
 
@@ -21,7 +23,7 @@ class CSICamera : public Camera {
         int frame_rate;
         bool debug;
 
-        // Gstreamer attributes
+        // GST attributes
         guint bus_watch_id;
         GstElement *pipeline = nullptr;
         GstBus *bus = nullptr;
@@ -116,12 +118,16 @@ class CSICamera : public Camera {
         // OVERRIDE
 
         void reconfigure(Dependencies deps, ResourceConfig cfg) override {
-            // Stop gst pipeline
-            stop_pipeline();
+            if (debug) {
+                std::cout << "Reconfiguring CSI Camera module" << std::endl;
+            }
 
             // Update attributes
             auto attrs = cfg.attributes();
             validate_attrs(attrs);
+
+            // Stop gst pipeline
+            stop_pipeline();
 
             // Create GST pipeline
             std::string pipeline_args = create_pipeline();
@@ -174,6 +180,7 @@ class CSICamera : public Camera {
         };
 
         // GST
+
         void csi_init(std::string pipeline_args) {
             // Build gst pipeline
             pipeline = gst_parse_launch(
@@ -184,6 +191,9 @@ class CSICamera : public Camera {
                 std::cerr << "Failed to create the pipeline" << std::endl;
                 std::exit(EXIT_FAILURE);
             }
+
+            // Print pipeline structure
+            // GST_DEBUG_BIN_TO_DOT_FILE(GST_BIN(pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "pipeline_structure");
             
             // Fetch the appsink element
             appsink = gst_bin_get_by_name(GST_BIN(pipeline), "appsink0");
@@ -232,14 +242,14 @@ class CSICamera : public Camera {
             }
 
             if (ret == GST_STATE_CHANGE_SUCCESS) {
-                std::cout << "GST pipeline started" << std::endl;
+                std::cout << "GST pipeline state change success" << std::endl;
             } else if (ret == GST_STATE_CHANGE_FAILURE) {
-                std::cerr << "GST pipeline failed to start" << std::endl;
+                std::cerr << "GST pipeline failed to change state" << std::endl;
                 std::exit(EXIT_FAILURE);
             } else if (ret = GST_STATE_CHANGE_NO_PREROLL) {
-                std::cout << "GST pipeline started but not enough data for preroll" << std::endl;
+                std::cout << "GST pipeline changed but not enough data for preroll" << std::endl;
             } else {
-                std::cerr << "GST pipeline failed to start" << std::endl;
+                std::cerr << "GST pipeline failed to change state" << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 
@@ -247,6 +257,10 @@ class CSICamera : public Camera {
         }
         
         void stop_pipeline() {
+            if (debug) {
+                std::cout << "Stopping GST pipeline" << std::endl;
+            }
+
             // Stop the pipeline
             if (gst_element_set_state(pipeline, GST_STATE_NULL) == GST_STATE_CHANGE_FAILURE) {
                 std::cerr << "Failed to stop the pipeline" << std::endl;
@@ -262,6 +276,9 @@ class CSICamera : public Camera {
             gst_object_unref(pipeline);
             gst_object_unref(bus);
             g_source_remove(bus_watch_id);
+            appsink = nullptr;
+            pipeline = nullptr;
+            bus = nullptr;
 
             return;
         }
@@ -325,7 +342,7 @@ class CSICamera : public Camera {
                 << ",height=" << std::to_string(DEFAULT_OUTPUT_HEIGHT)
                 << " ! " << DEFAULT_OUTPUT_ENCODER
                 << " ! " << DEFAULT_OUTPUT_MIMETYPE
-                << " ! appsink max-buffers=1";
+                << " ! appsink name=appsink0 max-buffers=1";
 
             return oss.str();
         }
