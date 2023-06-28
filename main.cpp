@@ -1,14 +1,14 @@
 #include <iostream>
 #include <gst/gst.h>
 
-#include "constraints.h"
-#include "csi_camera.cpp"
-
 #include <viam/sdk/module/module.hpp>
 #include <viam/sdk/module/service.hpp>
 #include <viam/sdk/resource/resource.hpp>
 #include <viam/sdk/registry/registry.hpp>
 #include <viam/sdk/components/camera/server.hpp>
+
+#include "constraints.h"
+#include "csi_camera.cpp"
 
 using namespace viam::sdk;
 

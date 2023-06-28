@@ -5,13 +5,12 @@
 #include <thread>
 #include <chrono>
 
-#include "constraints.h"
-
 #include <gst/gst.h>
 #include <gst/app/gstappsink.h>
 #include <viam/sdk/components/camera/camera.hpp>
 #include <viam/api/component/camera/v1/camera.grpc.pb.h>
 
+#include "constraints.h"
 
 using namespace viam::sdk;
 
@@ -336,15 +335,6 @@ class CSICamera : public Camera {
                 // Release the sample
                 gst_sample_unref(sample);
             }
-
-            // Check for EOS message
-            // msg = gst_bus_pop_filtered(bus, GST_MESSAGE_EOS);
-            // if (msg != nullptr) {
-            //     std::cout << "end of stream received" << std::endl;
-            //     gst_message_unref(msg);
-            //     // Exit process when EOS message is received
-            //     std::exit(EXIT_SUCCESS);
-            // }
 
             msg = gst_bus_pop(bus);
             if (msg != nullptr) {
