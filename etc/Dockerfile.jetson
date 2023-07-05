@@ -97,13 +97,13 @@ RUN cd ${HOME}/opt/src && \
 
 # install viam-csi
 RUN cp -r ${HOME}/opt/src/viam-cpp-sdk/build/install/* /usr/local/
+
 # install dev files
 RUN apt-get -y install gstreamer1.0-dev libgstreamer-plugins-base1.0-dev
-
 RUN apt-get -y install libfuse-dev
 
-ADD ../ ${HOME}/opt/src/viam-csi
-RUN cd ${HOME}/opt/src && \
+ADD ../ /root/opt/src/viam-csi
+RUN cd /root/opt/src && \
     cd viam-csi  && \
     make build && \
     make package

@@ -49,6 +49,7 @@ docker-module:
 bin-module:
 	rm -rf bin | true && \
 	mkdir -p bin && \
+	docker stop viam-csi-bin | true && \
 	docker rm viam-csi-bin | true && \
 	docker run -d -it --name viam-csi-bin viam-csi:$(L4T_VERSION) && \
 	docker cp viam-csi-bin:/root/opt/src/viam-csi/etc/viam-csi-0.0.1-aarch64.AppImage ./bin && \
