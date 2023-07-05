@@ -43,7 +43,7 @@ class CSICamera : public Camera {
             }
             
             // Start GST pipeline
-            csi_init(pipeline_args);
+            init_csi(pipeline_args);
         }
 
         void validate_attrs(AttributeMap attrs) {
@@ -134,7 +134,7 @@ class CSICamera : public Camera {
             }
 
             // Start GST pipeline
-            csi_init(pipeline_args);
+            init_csi(pipeline_args);
         }
 
         raw_image get_image(std::string mime_type) override {
@@ -148,7 +148,7 @@ class CSICamera : public Camera {
                 return image;
             } else {
                 // TODO: handle no bytes retrieved
-                image.bytes = csi_get_image();
+                image.bytes = get_csi_image();
             }
 
             return image;
@@ -179,7 +179,7 @@ class CSICamera : public Camera {
 
         // GST
 
-        void csi_init(std::string pipeline_args) {
+        void init_csi(std::string pipeline_args) {
             // Build gst pipeline
             pipeline = gst_parse_launch(
                 pipeline_args.c_str(),
@@ -230,7 +230,6 @@ class CSICamera : public Camera {
         void wait_pipeline() {
             GstState state, pending;
             GstStateChangeReturn ret;
-            // while (gst_element_get_state(pipeline, &state, &pending, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_ASYNC) {
             while ((ret = gst_element_get_state(pipeline, &state, &pending, GST_CLOCK_TIME_NONE)) == GST_STATE_CHANGE_ASYNC) {
                 // wait for state change to complete
             }
@@ -321,7 +320,7 @@ class CSICamera : public Camera {
                 g_free(debugInfo);
         }
 
-        std::vector<unsigned char> csi_get_image() {
+        std::vector<unsigned char> get_csi_image() {
             // Pull sample from appsink
             std::vector<unsigned char> vec;
             sample = gst_app_sink_pull_sample(GST_APP_SINK(appsink));
@@ -336,10 +335,11 @@ class CSICamera : public Camera {
                 gst_sample_unref(sample);
             }
 
+            // Check bus for messages
             msg = gst_bus_pop(bus);
             if (msg != nullptr) {
                 catch_pipeline();
-                gst_message_unref(msg); // Unreference the message
+                gst_message_unref(msg);
                 msg = nullptr;
             }
 
