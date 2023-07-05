@@ -3,6 +3,11 @@ CWD := .
 BUILD_DIR := $(cwd)/build
 INSTALL_DIR := $(BUILD_DIR)/AppDir
 
+# clang-format
+CXX := clang++
+CXXFLAGS := -std=c++14 -Wall -Wextra
+SRC := main.cpp csi_camera.cpp constraints.h
+
 # Docker
 L4T_VERSION := 35.3.1
 
@@ -14,13 +19,16 @@ build:
 	mkdir -p build && \
 	cd build && \
 	cmake -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR) .. -G Ninja && \
-	ninja -j $(shell nproc) && \
-	sudo ninja install -j $(shell nproc)
+	ninja -j $(shell nproc)
 
 # Creates appimage cmake build.
 package:
 	cd etc && \
 	appimage-builder --recipe viam-csi-module-aarch64.yml
+
+# lint:
+# 	$(MAKE) build && \
+# 	clang-tidy -p ./build $(SRC) -- $(CXXFLAGS)
 
 # Builds docker image with viam-cpp-sdk and viam-csi installed.
 image:
@@ -44,7 +52,7 @@ bin-module:
 	docker rm viam-csi-bin | true && \
 	docker run -d -it --name viam-csi-bin viam-csi:$(L4T_VERSION) && \
 	docker cp viam-csi-bin:/root/opt/src/viam-csi/etc/viam-csi-0.0.1-aarch64.AppImage ./bin && \
-	docker cp viam-csi-bin:/root/opt/src/viam-csi/build/csi-mr ./bin && \
+	docker cp viam-csi-bin:/root/opt/src/viam-csi/build/viam-csi ./bin && \
 	docker stop viam-csi-bin
 
 # SDK

@@ -290,7 +290,6 @@ class CSICamera : public Camera {
                     break;
                 case GST_MESSAGE_EOS:
                     std::cout << "End of stream received" << std::endl;
-                    // Stop the pipeline
                     stop_pipeline();
                     std::exit(EXIT_SUCCESS);
                     break;
@@ -384,7 +383,7 @@ class CSICamera : public Camera {
         }
         
         std::vector<unsigned char> get_test_image() {
-            std::string test_image_path = "/home/viam/csi-mr/etc/viam-logo.jpeg";
+            std::string test_image_path = "./etc/viam-logo.jpeg";
             
             // Create filestream
             std::ifstream file(test_image_path, std::ios::binary);

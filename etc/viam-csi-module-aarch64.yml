@@ -3,7 +3,7 @@ version: 1
 script:
 - rm -rf $TARGET_APPDIR | true
 - mkdir -p "$TARGET_APPDIR/usr/bin"
-- cp ../build/csi-mr "$TARGET_APPDIR/usr/bin/csi-mr"
+- cp ../build/viam-csi "$TARGET_APPDIR/usr/bin/viam-csi"
 - mkdir -p "$TARGET_APPDIR/usr/share/icons/viam/256x256/apps/"
 - cp ./viam-server.png "$TARGET_APPDIR/usr/share/icons/viam/256x256/apps/viam-server.png"
 - chmod 755 "$TARGET_APPDIR/usr/bin/"*
@@ -15,7 +15,7 @@ AppDir:
     name: viam-csi
     icon: viam-server
     version: 0.0.1
-    exec: usr/bin/csi-mr
+    exec: usr/bin/viam-csi
     exec_args: $@
   apt:
     arch:
