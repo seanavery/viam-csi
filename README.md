@@ -20,7 +20,9 @@ sudo wget https://github.com/seanavery/viam-csi/releases/download/v0.0.1/viam-cs
 sudo chmod a+rx /usr/local/bin/viam-csi
 ```
 
-2. Run RDK with example config file [etc/app-config.json](https://github.com/seanavery/viam-csi/blob/master/etc/app-config.json).
+2. Run [viam-server](https://docs.viam.com/installation/) with example config file [etc/app-config.json](https://github.com/seanavery/viam-csi/blob/master/etc/app-config.json).
+
+viam-server will automatically load the module. You can now head over to app.viam.com and view the control tab for the camera feed. If you do not see anything, check the logs tab for errors.
 
 ### support
 - [x] jetson
