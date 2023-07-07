@@ -1,15 +1,18 @@
 # viam-csi
 > csi camera viam module
 
+
+Currently in ALPHA and only supports Jetson. Please open an issue if you run into problems.
+
 ### why?
 
-Want to use CSI cameras with viam? This is the module for you. viam-csi is a [Viam Module](https://docs.viam.com/extend/modular-resources/) that includes a simple wrapper around [GStreamer](https://gstreamer.freedesktop.org/documentation/?gi-language=c) and an interface that satisfies a [Viam Camera Component](https://docs.viam.com/components/camera/webcam/). This means you can utilize the hardware accelerated GST plugins on your Jetson or Pi with the Viam ecosystem.
+Want to use CSI cameras with viam? This is the module for you. 
 
-### usage
+[Viam Module](https://docs.viam.com/extend/modular-resources/) that includes a simple wrapper around [GStreamer](https://gstreamer.freedesktop.org/documentation/?gi-language=c) and an interface that satisfies a [Viam Camera Component](https://docs.viam.com/components/camera/webcam/). This means you can utilize the hardware accelerated GST plugins on your Jetson or Pi with the Viam ecosystem.
 
 1. Download appimage from releases page.
 ```bash
-sudo curl -o /usr/local/bin/viam-csi https://github.com/seanvery/viam-csi/archive/refs/tags/v0.0.01-viam-csi
+sudo wget https://github.com/seanavery/viam-csi/releases/download/v0.0.1/viam-csi-0.0.1-aarch64.AppImage -O /usr/local/bin/viam-csi
 sudo chmod a+rx /usr/local/bin/viam-csi
 ```
 
