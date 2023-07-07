@@ -1,14 +1,11 @@
 # CMake
-CWD := .
-BUILD_DIR := $(cwd)/build
+BUILD_DIR := ./build
 INSTALL_DIR := $(BUILD_DIR)/AppDir
-
-# clang-format
-CXX := clang++
-CXXFLAGS := -std=c++14 -Wall -Wextra
-SRC := main.cpp csi_camera.cpp constraints.h
+BIN_DIR := ./bin
 
 # Docker
+IMAGE_NAME := viam-csi
+IMAGE_TAG := 0.0.1
 L4T_VERSION := 35.3.1
 
 # Module
@@ -26,14 +23,11 @@ package:
 	cd etc && \
 	appimage-builder --recipe viam-csi-module-aarch64.yml
 
-# lint:
-# 	$(MAKE) build && \
-# 	clang-tidy -p ./build $(SRC) -- $(CXXFLAGS)
-
 # Builds docker image with viam-cpp-sdk and viam-csi installed.
 image:
 	rm -rf build | true && \
-	docker build -t viam-csi:$(L4T_VERSION) \
+	docker build -t $(IMAGE_NAME):$(IMAGE_TAG) \
+		--target=cpp-sdk-builder \
 		--memory=16g \
 		--build-arg TAG=$(L4T_VERSION) \
 		-f ./etc/Dockerfile.jetson ./
@@ -43,7 +37,7 @@ docker-module:
 	docker run \
 		--device /dev/fuse \
 		--cap-add SYS_ADMIN \
-		-it viam-csi:$(L4T_VERSION)
+		-it $(IMAGE_NAME):$(IMAGE_TAG)
 
 # Copies binary and AppImage from container to host.
 bin-module:
@@ -51,7 +45,7 @@ bin-module:
 	mkdir -p bin && \
 	docker stop viam-csi-bin | true && \
 	docker rm viam-csi-bin | true && \
-	docker run -d -it --name viam-csi-bin viam-csi:$(L4T_VERSION) && \
+	docker run -d -it --name viam-csi-bin $(IMAGE_NAME):$(IMAGE_TAG) && \
 	docker cp viam-csi-bin:/root/opt/src/viam-csi/etc/viam-csi-0.0.1-aarch64.AppImage ./bin && \
 	docker cp viam-csi-bin:/root/opt/src/viam-csi/build/viam-csi ./bin && \
 	docker stop viam-csi-bin
