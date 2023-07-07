@@ -27,10 +27,13 @@ package:
 image:
 	rm -rf build | true && \
 	docker build -t $(IMAGE_NAME):$(IMAGE_TAG) \
-		--target=cpp-sdk-builder \
 		--memory=16g \
 		--build-arg TAG=$(L4T_VERSION) \
 		-f ./etc/Dockerfile.jetson ./
+
+pi-image:
+	docker build -t $(IMAGE_NAME)-pi:$(IMAGE_TAG) \
+		-f ./viam-cpp-sdk/etc/docker/Dockerfile.debian.bullseye ./
 
 # Runs docker image with shell.
 docker-module:
