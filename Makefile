@@ -58,7 +58,8 @@ build-sdk:
 	cd build && \
 	cmake -DVIAMCPPSDK_USE_DYNAMIC_PROTOS=ON -DVIAMCPPSDK_OFFLINE_PROTO_GENERATION=ON .. -G Ninja && \
 	ninja -j $(shell nproc) && \
-	sudo ninja install -j $(shell nproc))
+	sudo ninja install -j $(shell nproc)) && \
+	cp -r ./install/* /usr/local/
 
 docker-sdk:
 	docker build -t viam-cpp-sdk -f ./viam-cpp-sdk/etc/docker/Dockerfile.ubuntu.focal ./ && \

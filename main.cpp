@@ -32,7 +32,7 @@ int serve(const std::string& socket_path) {
 
     try {
         Registry::register_model(module_registration);
-        std::cout << "registered model " << API_NAMESPACE <<  ":" << API_TYPE << ":" << API_SUBTYPE << std::endl;
+        std::cout << "registered model: " << API_NAMESPACE <<  ":" << API_TYPE << ":" << API_SUBTYPE << std::endl;
     } catch (const std::runtime_error& e) {
         std::cerr << "error registering model: " << e.what() << std::endl;
         return EXIT_FAILURE;

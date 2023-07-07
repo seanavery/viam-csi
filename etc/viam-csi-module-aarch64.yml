@@ -29,7 +29,6 @@ AppDir:
     - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal multiverse
     - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-updates multiverse
     - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-backports main restricted
-        universe multiverse
     - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-security main restricted
     - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-security universe
     - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-security multiverse
@@ -46,20 +45,12 @@ AppDir:
     - libgcc-s1:arm64
   files:
     include:
-    - /lib/aarch64-linux-gnu/libgstapp-1.0.so.0
-    - /lib/aarch64-linux-gnu/libgstreamer-1.0.so.0
-    - /usr/local/lib/libviamsdk*
-    
-    exclude:
-    - usr/share/man
-    - usr/share/doc/*/README.*
-    - usr/share/doc/*/changelog.*
-    - usr/share/doc/*/NEWS.*
-    - usr/share/doc/*/TODO.*
-  test:
-    debian-stable:
-      image: appimagecrafters/tests-env:debian-stable
-      command: ./AppRun
+    - /usr/lib/aarch64-linux-gnu/libgst*
+    - /usr/local/lib/libviamsdka*
+    - /usr/local/lib/libviam_rust*
+    - /usr/local/lib/libgrpc*
+    - /usr/local/lib/libasl*
+    - /usr/local/lib/libproto*
 
 AppImage:
   arch: aarch64

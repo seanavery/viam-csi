@@ -3,7 +3,7 @@
 
 ### why?
 
-Want to use CSI cameras with viam? This is the module for you! This module is simple wrapper around [GStreamer](https://gstreamer.freedesktop.org/documentation/?gi-language=c) that satisfies the [Viam Camera Component](https://docs.viam.com/components/camera/webcam/) interface. This means you can utilize the hardware accelerated GST plugins on your Jetson or Pi with the Viam ecosystem.
+Want to use CSI cameras with viam? This is the module for you. viam-csi is a [Viam Module](https://docs.viam.com/extend/modular-resources/) that includes a simple wrapper around [GStreamer](https://gstreamer.freedesktop.org/documentation/?gi-language=c) and an interface that satisfies a [Viam Camera Component](https://docs.viam.com/components/camera/webcam/). This means you can utilize the hardware accelerated GST plugins on your Jetson or Pi with the Viam ecosystem.
 
 ### usage
 
