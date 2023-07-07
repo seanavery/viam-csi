@@ -21,7 +21,11 @@ build:
 # Creates appimage cmake build.
 package:
 	cd etc && \
-	appimage-builder --recipe viam-csi-module-aarch64.yml
+	appimage-builder --recipe viam-csi-jetson-arm64.yml
+
+pi-package:
+	cd etc && \
+	appimage-builder --recipe viam-csi-pi-arm64.yml
 
 # Builds docker image with viam-cpp-sdk and viam-csi installed.
 image:
