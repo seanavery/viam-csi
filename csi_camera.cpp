@@ -11,6 +11,7 @@
 #include <viam/api/component/camera/v1/camera.grpc.pb.h>
 
 #include "constraints.h"
+#include "utils.cpp"
 
 using namespace viam::sdk;
 
@@ -30,9 +31,27 @@ class CSICamera : public Camera {
         GstSample *sample = nullptr;
         GstBuffer *buffer = nullptr;
         GstElement* appsink = nullptr;
+
+        // Pipeline
+        std::string input_source;
+        std::string output_encoder;
     
     public:
         explicit CSICamera(std::string name, AttributeMap attrs) : Camera(std::move(name)) {
+            // Get device type
+            device_type device = get_device_type();
+            if (device == device_type::unknown) {
+                std::cout << "ERROR: device type unknown" << std::endl;
+                input_source = DEFAULT_INPUT_SOURCE;
+                output_encoder = DEFAULT_OUTPUT_ENCODER;
+            } else if (device == device_type::jetson) {
+                input_source = JETSON_INPUT_SOURCE;
+                output_encoder = JETSON_OUTPUT_ENCODER;
+            } else if (device == device_type::pi) {
+                input_source = PI_INPUT_SOURCE;
+                output_encoder = PI_OUTPUT_ENCODER;
+            }
+
             // Validate attributes
             validate_attrs(attrs);
 
@@ -350,7 +369,7 @@ class CSICamera : public Camera {
         std::string create_pipeline() {
             std::ostringstream oss;
 
-            oss << DEFAULT_INPUT_SOURCE << " sensor_id=" << video_path
+            oss << input_source << " sensor_id=" << video_path
                 << " ! " << DEFAULT_INPUT_FORMAT
                 << ",width=" << std::to_string(width_px)
                 << ",height=" << std::to_string(height_px)
@@ -359,7 +378,7 @@ class CSICamera : public Camera {
                 << " ! " << DEFAULT_OUTPUT_FORMAT
                 << ",width=" << std::to_string(DEFAULT_OUTPUT_WIDTH)
                 << ",height=" << std::to_string(DEFAULT_OUTPUT_HEIGHT)
-                << " ! " << DEFAULT_OUTPUT_ENCODER
+                << " ! " << output_encoder
                 << " ! " << DEFAULT_OUTPUT_MIMETYPE
                 << " ! appsink name=appsink0 max-buffers=1";
 

@@ -21,3 +21,10 @@
 #define DEFAULT_OUTPUT_HEIGHT 540
 #define DEFAULT_OUTPUT_ENCODER "nvjpegenc"
 #define DEFAULT_OUTPUT_MIMETYPE "image/jpeg"
+
+
+#define JETSON_INPUT_SOURCE "nvarguscamerasrc"
+#define JETSON_OUTPUT_ENCODER "nvjpegenc"
+
+#define PI_INPUT_SOURCE "libcamerasrc"
+#define PI_OUTPUT_ENCODER "jpegenc"
