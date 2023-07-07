@@ -18,17 +18,27 @@ RUN apt-get -y --no-install-recommends install \
     gnupg \
     gpg \
     less \
-    libabsl-dev \
     libboost-all-dev \
-    libgrpc++-dev \
-    libprotobuf-dev \
+    libc-ares-dev \
+    libre2-dev \
     libssl-dev \
     ninja-build \
     pkg-config \
-    protobuf-compiler-grpc \
     software-properties-common \
     sudo \
-    wget
+    wget \
+    zlib1g-dev
+    # libabsl-dev \
+    # libboost-all-dev \
+    # libgrpc++-dev \
+    # libprotobuf-dev \
+    # libssl-dev \
+    # ninja-build \
+    # pkg-config \
+    # protobuf-compiler-grpc \
+    # software-properties-common \
+    # sudo \
+    # wget
 
 # Add the public key for the llvm repository
 RUN bash -c 'wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -'
@@ -44,6 +54,29 @@ RUN apt-get -y --no-install-recommends install -t llvm-toolchain-bullseye-15 \
 RUN apt-get -y --no-install-recommends install -t bullseye-backports \
     cmake
 
+RUN mkdir -p ${HOME}/opt/src
+
+# Install grpc
+RUN cd ${HOME}/opt/src && \
+    git clone --recurse-submodules -b v1.52.0 --depth 1 --shallow-submodules https://github.com/grpc/grpc && \
+    cd grpc && \
+    mkdir -p build && \
+    cd build && \
+    cmake .. -G Ninja \
+        -DgRPC_ZLIB_PROVIDER=package \
+        -DgRPC_CARES_PROVIDER=package \
+        -DgRPC_RE2_PROVIDER=package \
+        -DgRPC_SSL_PROVIDER=package \
+        -DgRPC_INSTALL=ON \
+        -DgRPC_BUILD_TESTS=OFF \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_INSTALL_RPATH=/usr/local/lib && \
+    ninja install && \
+    cd .. && \
+    rm -rf build
+
 # Install cpp-sdk
 RUN mkdir -p ${HOME}/opt/src
 RUN cd ${HOME}/opt/src && \
@@ -53,3 +86,18 @@ RUN cd ${HOME}/opt/src && \
     cd build && \
     cmake  -DVIAMCPPSDK_USE_DYNAMIC_PROTOS=ON -DVIAMCPPSDK_OFFLINE_PROTO_GENERATION=ON .. -G Ninja  && \
     ninja install -j1
+RUN cp -r ${HOME}/opt/src/viam-cpp-sdk/build/install/* /usr/local
+
+# Install viam-csi
+RUN apt-get install -y \
+    gstreamer1.0-tools gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+    libgstreamer-plugins-base1.0-dev \
+    gstreamer1.0-omx
+
+# RUN cd ${HOME}/opt/src && \
+#     git clone https://github.com/seanavery/viam-csi.git && \
+#     cd viam-csi && \
+#     make build
+
+

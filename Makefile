@@ -33,7 +33,8 @@ image:
 
 pi-image:
 	docker build -t $(IMAGE_NAME)-pi:$(IMAGE_TAG) \
-		-f ./viam-cpp-sdk/etc/docker/Dockerfile.debian.bullseye ./
+		--memory=16g \
+		-f ./etc/Dockerfile.pi ./
 
 # Runs docker image with shell.
 docker-module:
