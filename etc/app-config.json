@@ -1,7 +1,7 @@
 {
     "modules": [
       {
-        "executable_path": "/usr/bin/csi-mr",
+        "executable_path": "/usr/local/bin/viam-csi",
         "name": "csi_cam_module"
       }
     ],
