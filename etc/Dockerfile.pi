@@ -95,9 +95,9 @@ RUN apt-get install -y \
     libgstreamer-plugins-base1.0-dev \
     gstreamer1.0-omx
 
-# RUN cd ${HOME}/opt/src && \
-#     git clone https://github.com/seanavery/viam-csi.git && \
-#     cd viam-csi && \
-#     make build
+RUN cd ${HOME}/opt/src && \
+    git clone https://github.com/seanavery/viam-csi.git && \
+    cd viam-csi && \
+    make build
 
 
