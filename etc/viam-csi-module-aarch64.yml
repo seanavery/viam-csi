@@ -1,0 +1,57 @@
+# appimage-builder recipe see https://appimage-builder.readthedocs.io for details
+version: 1
+script:
+- rm -rf $TARGET_APPDIR | true
+- mkdir -p "$TARGET_APPDIR/usr/bin"
+- cp ../build/viam-csi "$TARGET_APPDIR/usr/bin/viam-csi"
+- mkdir -p "$TARGET_APPDIR/usr/share/icons/viam/256x256/apps/"
+- cp ./viam-server.png "$TARGET_APPDIR/usr/share/icons/viam/256x256/apps/viam-server.png"
+- chmod 755 "$TARGET_APPDIR/usr/bin/"*
+
+AppDir:
+  path: ./AppDir
+  app_info:
+    id: com.viam.csi-module
+    name: viam-csi
+    icon: viam-server
+    version: 0.0.1
+    exec: usr/bin/viam-csi
+    exec_args: $@
+  apt:
+    arch:
+    - arm64
+    allow_unauthenticated: true
+    sources:
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal main restricted
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-updates main restricted
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal universe
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-updates universe
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal multiverse
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-updates multiverse
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-backports main restricted
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-security main restricted
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-security universe
+    - sourceline: deb http://ports.ubuntu.com/ubuntu-ports/ focal-security multiverse
+    - sourceline: deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main
+    - sourceline: deb https://repo.download.nvidia.com/jetson/common r35.3 main
+    - sourceline: deb https://repo.download.nvidia.com/jetson/t234 r35.3 main
+    # - sourceline: deb [signed-by=/usr/share/keyrings/cudnn-local-tegra-3763B8C9-keyring.gpg]
+#         file:///var/cudnn-local-tegra-repo-ubuntu2004-8.6.0.166 /
+    - sourceline: deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg]
+        https://apt.kitware.com/ubuntu/ focal main
+    include:
+    - libstdc++6:arm64
+    - libc6:arm64
+    - libgcc-s1:arm64
+  files:
+    include:
+    - /usr/lib/aarch64-linux-gnu/libgst*
+    - /usr/local/lib/libviamsdka*
+    - /usr/local/lib/libviam_rust*
+    - /usr/local/lib/libgrpc*
+    - /usr/local/lib/libasl*
+    - /usr/local/lib/libproto*
+
+AppImage:
+  arch: aarch64
+  update-information: guess

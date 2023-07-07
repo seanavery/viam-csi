@@ -1,0 +1,7 @@
+build
+gen
+bin
+etc/AppDir
+etc/appimage-build
+*.AppImage*
+*.tar*
