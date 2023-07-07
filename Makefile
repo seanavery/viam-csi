@@ -39,15 +39,15 @@ docker-module:
 		--cap-add SYS_ADMIN \
 		-it $(IMAGE_NAME):$(IMAGE_TAG)
 
-# Copies binary and AppImage from container to host.
+# Copies binary and appimage from container to host.
 bin-module:
-	rm -rf bin | true && \
-	mkdir -p bin && \
+	rm -rf $(BIN_DIR) | true && \
+	mkdir -p $(BIN_DIR) && \
 	docker stop viam-csi-bin | true && \
 	docker rm viam-csi-bin | true && \
 	docker run -d -it --name viam-csi-bin $(IMAGE_NAME):$(IMAGE_TAG) && \
-	docker cp viam-csi-bin:/root/opt/src/viam-csi/etc/viam-csi-0.0.1-aarch64.AppImage ./bin && \
-	docker cp viam-csi-bin:/root/opt/src/viam-csi/build/viam-csi ./bin && \
+	docker cp viam-csi-bin:/root/opt/src/viam-csi/etc/viam-csi-0.0.1-aarch64.AppImage $(BIN_DIR) && \
+	docker cp viam-csi-bin:/root/opt/src/viam-csi/build/viam-csi $(BIN_DIR) && \
 	docker stop viam-csi-bin
 
 # SDK
