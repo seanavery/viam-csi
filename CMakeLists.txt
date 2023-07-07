@@ -9,7 +9,6 @@ set(CMAKE_CXX_STANDARD 14) # setting C++ 14 standard
 find_package(PkgConfig REQUIRED) # finding pkg-config is a helper tool
 
 # finding cpp sdk
-set(CMAKE_PREFIX_PATH "/home/viam/viam-cpp-sdk/build/install" ${CMAKE_PREFIX_PATH})
 find_package(viam-cpp-sdk CONFIG REQUIRED)
 
 # using pkg-config to getting Gstreamer
@@ -36,12 +35,6 @@ target_link_libraries(${PROJECT_NAME}
         viam-cpp-sdk::viamsdk
         viam_rust_utils
 )
-
-# running clang-tidy linter
-# find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
-# if(CLANG_TIDY_EXE)
-#     set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
-# endif()
 
 # installing executable
 install(TARGETS ${PROJECT_NAME} DESTINATION usr/local/bin)
