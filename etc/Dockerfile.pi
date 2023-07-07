@@ -52,4 +52,4 @@ RUN cd ${HOME}/opt/src && \
     mkdir build && \
     cd build && \
     cmake  -DVIAMCPPSDK_USE_DYNAMIC_PROTOS=ON -DVIAMCPPSDK_OFFLINE_PROTO_GENERATION=ON .. -G Ninja  && \
-    ninja install
+    ninja install -j1
