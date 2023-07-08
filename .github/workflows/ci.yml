@@ -18,11 +18,11 @@ jobs:
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      - name: Build Docker container
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: etc/Dockerfile.jetson
-          tags: viam-csi-build:0.0.1
-          build-args: |
-            TAG=35.3.1
+      # - name: Build Docker container
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     file: etc/Dockerfile.jetson
+      #     tags: viam-csi-build:0.0.1
+      #     build-args: |
+      #       TAG=35.3.1
