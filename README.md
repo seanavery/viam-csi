@@ -24,7 +24,7 @@ ___
 
 1. Download appimage from releases page.
 ```bash
-sudo wget https://github.com/seanavery/viam-csi/releases/download/v0.0.1/viam-csi-0.0.1-aarch64.AppImage -O /usr/local/bin/viam-csi
+sudo wget https://github.com/seanavery/viam-csi/releases/download/v0.0.2/viam-csi-0.0.2-aarch64.AppImage -O /usr/local/bin/viam-csi
 ```
 
 ```bash
