@@ -132,6 +132,28 @@ class CSICamera : public Camera {
             }
         }
 
+        // GETTERS
+
+        std::string get_video_path() const {
+            return video_path;
+        }
+
+        int get_width_px() const {
+            return width_px;
+        }
+
+        int get_height_px() const {
+            return height_px;
+        }
+
+        int get_frame_rate() const {
+            return frame_rate;
+        }
+
+        bool is_debug() const {
+            return debug;
+        }
+
         // OVERRIDE
 
         void reconfigure(Dependencies deps, ResourceConfig cfg) override {
