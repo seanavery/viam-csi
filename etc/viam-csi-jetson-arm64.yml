@@ -46,6 +46,12 @@ AppDir:
   files:
     include:
     - /usr/lib/aarch64-linux-gnu/libgst*
+    - /usr/lib/aarch64-linux-gnu/libboost*
+    - /usr/lib/aarch64-linux-gnu/libz*
+    - /usr/lib/aarch64-linux-gnu/libre2*
+    - /usr/lib/aarch64-linux-gnu/libcares*
+    - /usr/lib/aarch64-linux-gnu/libcrypto*
+    - /usr/lib/aarch64-linux-gnu/libssl*
     - /usr/local/lib/libviamsdka*
     - /usr/local/lib/libviam_rust*
     - /usr/local/lib/libgrpc*
