@@ -25,7 +25,10 @@ ___
 1. Download appimage from releases page.
 ```bash
 sudo wget https://github.com/seanavery/viam-csi/releases/download/v0.0.1/viam-csi-0.0.1-aarch64.AppImage -O /usr/local/bin/viam-csi
-sudo chmod a+rx /usr/local/bin/viam-csi
+```
+
+```bash
+sudo chmod 755 /usr/local/bin/viam-csi
 ```
 
 2. Run [viam-server](https://docs.viam.com/installation/) with example config file [etc/app-config.json](https://github.com/seanavery/viam-csi/blob/master/etc/app-config.json).
