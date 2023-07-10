@@ -35,28 +35,46 @@ AppDir:
     - sourceline: deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main
     - sourceline: deb https://repo.download.nvidia.com/jetson/common r35.3 main
     - sourceline: deb https://repo.download.nvidia.com/jetson/t234 r35.3 main
-    # - sourceline: deb [signed-by=/usr/share/keyrings/cudnn-local-tegra-3763B8C9-keyring.gpg]
-#         file:///var/cudnn-local-tegra-repo-ubuntu2004-8.6.0.166 /
+    - sourceline: deb [signed-by=/usr/share/keyrings/cudnn-local-tegra-3763B8C9-keyring.gpg]
+        file:///var/cudnn-local-tegra-repo-ubuntu2004-8.6.0.166 /
     - sourceline: deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg]
         https://apt.kitware.com/ubuntu/ focal main
     include:
-    - libstdc++6:arm64
-    - libc6:arm64
+    # - libstdc++6:arm64
+    # - libc6:arm64
+    # - libgcc-s1:arm64
     - libgcc-s1:arm64
+    - libpcre3:arm64
+    - zlib1g:arm64
   files:
     include:
-    - /usr/lib/aarch64-linux-gnu/libgst*
-    - /usr/lib/aarch64-linux-gnu/libboost*
-    - /usr/lib/aarch64-linux-gnu/libz*
-    - /usr/lib/aarch64-linux-gnu/libre2*
-    - /usr/lib/aarch64-linux-gnu/libcares*
-    - /usr/lib/aarch64-linux-gnu/libcrypto*
-    - /usr/lib/aarch64-linux-gnu/libssl*
-    - /usr/local/lib/libviamsdka*
-    - /usr/local/lib/libviam_rust*
-    - /usr/local/lib/libgrpc*
-    - /usr/local/lib/libasl*
-    - /usr/local/lib/libproto*
+    # - /usr/lib/aarch64-linux-gnu/libgst*
+    # - /usr/lib/aarch64-linux-gnu/libglib*
+    # - /usr/lib/aarch64-linux-gnu/libboost*
+    # - /usr/lib/aarch64-linux-gnu/libz*
+    # - /usr/lib/aarch64-linux-gnu/libre2*
+    # - /usr/lib/aarch64-linux-gnu/libcares*
+    # - /usr/lib/aarch64-linux-gnu/libcrypto*
+    # - /usr/lib/aarch64-linux-gnu/libssl*
+    # - /usr/local/lib/libviamsdka*
+    # - /usr/local/lib/libviam_rust*
+    # - /usr/local/lib/libgrpc*
+    # - /usr/local/lib/libasl*
+    # - /usr/local/lib/libproto*
+
+    # - /lib/aarch64-linux-gnu/libgstapp-1.0.so.0
+    # - /lib/aarch64-linux-gnu/libgst*
+    # - /lib/aarch64-linux-gnu/libglib*
+    # - /lib/aarch64-linux-gnu/libobj*
+    - gstreamer1.0-x
+    - gstreamer1.0-alsa
+    - gstreamer1.0-plugins-base
+    - gstreamer1.0-plugins-good
+    - gstreamer1.0-plugins-bad
+    - gstreamer1.0-plugins-ugly
+    - gstreamer1.0-pulseaudio
+    - /usr/local/lib/libprotobuf.so.32
+    - /usr/local/lib/libviamsdk.so.noabi
 
 AppImage:
   arch: aarch64
