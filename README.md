@@ -4,7 +4,7 @@
 ![](./etc/viam-server.png)
 
 
-**Warning** Currently in ALPHA and only supports Jetson. Please open an issue if you run into problems.
+> **Warning** Currently in ALPHA and only supports Jetson. Please open an issue if you run into problems.
 
 ___
 
