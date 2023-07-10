@@ -14,7 +14,7 @@ AppDir:
     id: com.viam.csi-module
     name: viam-csi
     icon: viam-server
-    version: 0.0.1
+    version: 0.0.2
     exec: usr/bin/viam-csi
     exec_args: $@
   apt:

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(viam-csi
-        VERSION 0.0.1
+        VERSION 0.0.2
         DESCRIPTION "viam module for csi cameras"
 )
 
