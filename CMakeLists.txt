@@ -12,6 +12,9 @@ set(GNU_INCLUDE_PATH /usr/include/aarch64-linux-gnu)
 set(LOCAL_LIB_PATH /usr/local/lib)
 set(LOCAL_INCLUDE_PATH /usr/local/include)
 
+enable_testing()
+find_package(GTest REQUIRED)
+
 find_package(PkgConfig REQUIRED)
 find_package(viam-cpp-sdk CONFIG REQUIRED)
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-app-1.0 gstreamer-base-1.0)
@@ -30,6 +33,7 @@ link_directories(
         ${LOCAL_LIB_PATH}
 )
 
+# Main executable
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} 
@@ -38,3 +42,17 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION usr/local/bin)
+
+
+# Test executable
+add_executable(${PROJECT_NAME}_test test/test_csi_camera.cpp)
+
+target_link_libraries(${PROJECT_NAME}_test
+        ${GSTREAMER_LIBRARIES}
+        GTest::GTest
+        GTest::Main
+        viam-cpp-sdk::viamsdk
+)
+
+# Add the test as a target
+add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
