@@ -99,20 +99,49 @@ RUN cd ${HOME}/opt/src && \
     pip3 install ./
 
 # Install GStreamer
+# RUN apt-get install -y \
+#     libgstreamer1.0-dev \
+#     libgstreamer1.0-app-dev \
+#     gstreamer1.0-plugins-base \
+#     gstreamer1.0-plugins-good \
+#     gstreamer1.0-plugins-bad \
+#     gstreamer1.0-plugins-ugly \
+#     gstreamer1.0-tools \
+#     gstreamer1.0-x
+
 RUN apt-get install -y \
     libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgstreamer-plugins-bad1.0-dev \
     gstreamer1.0-plugins-base \
     gstreamer1.0-plugins-good \
     gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav \
     gstreamer1.0-tools \
-    gstreamer1.0-x
+    gstreamer1.0-x \
+    gstreamer1.0-alsa \
+    gstreamer1.0-gl \
+    gstreamer1.0-gtk3 \
+    gstreamer1.0-qt5 \
+    gstreamer1.0-pulseaudio 
+
 # Install GTest
 RUN apt-get -y install libgtest-dev
 RUN cd /usr/src/gtest && \
     cmake CMakeLists.txt && \
     make && \
-    cp *.a /usr/lib
+    cp lib/*.a /usr/lib
+
+# RUN apt-get install -y google-mock
+# RUN cd /usr/src/gmock
+
+RUN apt-get install libgmock-dev && \
+    cd /usr/src/googletest/googlemock/ && \
+    mkdir build && \
+    cmake .. && \
+    make && \
+    cp lib/*.a /usr/lib
 
 # Install viam-csi
 RUN apt-get -y install libfuse-dev
