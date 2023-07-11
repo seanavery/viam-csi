@@ -38,5 +38,7 @@ viam-server will automatically load the module. You can now head over to app.via
 ___
 
 ### support
+
+Check [SUPPORT.md](./doc/SUPPORT.md) for a more comprehensive list of tested setups.
 - [x] jetson
 - [ ] pi
