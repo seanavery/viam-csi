@@ -1,23 +1,23 @@
 {
-    "modules": [
-      {
-        "executable_path": "/usr/local/bin/viam-csi",
-        "name": "csi_cam_module"
-      }
-    ],
-    "components": [
-      {
-        "model": "viam:camera:csi",
-        "attributes": {
-          "width_px": 1920,
-          "height_px": 1080,
-          "frame_rate": 30,
-          "debug": true
-        },
-        "depends_on": [],
-        "name": "csicam_test",
-        "namespace": "rdk",
-        "type": "camera"
-      }
-    ]
-  }
+  "modules": [
+    {
+      "executable_path": "/usr/local/bin/viam-csi",
+      "name": "csi_cam_module"
+    }
+  ],
+  "components": [
+    {
+      "model": "viam:camera:csi",
+      "attributes": {
+        "width_px": 1920,
+        "height_px": 1080,
+        "frame_rate": 30,
+        "debug": true
+      },
+      "depends_on": [],
+      "name": "csicam_test",
+      "namespace": "rdk",
+      "type": "camera"
+    }
+  ]
+}
