@@ -77,7 +77,7 @@ docker-sdk:
 # Tests out package in a fresh container.
 docker-tests:
 	docker build \
-		-t viam-csi-tests \
+		-t viam-csi-tests:$(IMAGE_TAG) \
 		--build-arg TAG=$(L4T_VERSION) \
 		-f ./etc/Dockerfile.test.jetson ./ && \
 	docker run  \
@@ -96,7 +96,7 @@ docker-ci:
 		./
 
 # Utils
-# Installs waveshare camera overrides.
+# Installs waveshare camera overrides on Jetson.
 waveshare:
 	mkdir -p gen && \
 	wget https://www.waveshare.com/w/upload/e/eb/Camera_overrides.tar.gz -O gen/Camera_overrides.tar.gz && \
@@ -104,3 +104,11 @@ waveshare:
 	sudo cp gen/camera_overrides.isp /var/nvidia/nvcam/settings/ && \
 	sudo chmod 664 /var/nvidia/nvcam/settings/camera_overrides.isp && \
 	sudo chown root:root /var/nvidia/nvcam/settings/camera_overrides.isp
+
+# Installs Arducam IMX477 driver on Jetson.
+arducam:
+	mkdir -p gen && \
+	cd gen && \
+	wget https://github.com/ArduCAM/MIPI_Camera/releases/download/v0.0.3/install_full.sh && \
+	chmod +x install_full.sh && \
+	./install_full.sh -m imx477
