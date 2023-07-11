@@ -34,7 +34,7 @@ TEST(CSICamera, CreateCustom) {
     attrs->insert(std::make_pair("width_px", std::make_shared<ProtoType>(640)));
     attrs->insert(std::make_pair("height_px", std::make_shared<ProtoType>(480)));
     attrs->insert(std::make_pair("frame_rate", std::make_shared<ProtoType>(60)));
-    attrs->insert(std::make_pair("video_path", std::make_shared<ProtoType>("1")));
+    attrs->insert(std::make_pair("video_path", std::make_shared<ProtoType>(std::string("1"))));
 
     CSICamera camera("test", attrs);
 
@@ -43,6 +43,23 @@ TEST(CSICamera, CreateCustom) {
     EXPECT_EQ(camera.get_height_px(), 480);
     EXPECT_EQ(camera.get_frame_rate(), 60);
     EXPECT_EQ(camera.get_video_path(), "1");
+
+    camera.stop_pipeline();
+}
+
+// Test that GST pipeline can be started and stopped
+TEST(CSICamera, StartStopPipeline) {
+    gst_init(nullptr, nullptr);
+
+    AttributeMap attrs = std::make_shared<std::unordered_map<std::string, std::shared_ptr<ProtoType>>>();
+    attrs->insert(std::make_pair("debug", std::make_shared<ProtoType>(true)));
+
+    CSICamera camera("test", attrs);
+
+    auto pipeline = camera.get_pipeline();
+    auto appsink = camera.get_appsink();
+    EXPECT_EQ(GST_STATE(pipeline), GST_STATE_PLAYING);
+    EXPECT_EQ(GST_STATE(appsink), GST_STATE_PLAYING);
 
     camera.stop_pipeline();
 }
