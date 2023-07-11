@@ -2,8 +2,6 @@
 #include <fstream>
 #include <cstring>
 #include <sstream>
-#include <thread>
-#include <chrono>
 
 #include <gst/gst.h>
 #include <gst/app/gstappsink.h>
