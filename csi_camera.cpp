@@ -18,11 +18,11 @@ using namespace viam::sdk;
 class CSICamera : public Camera {
     private:
         // Camera attributes
-        std::string video_path;
-        int width_px;
-        int height_px;
-        int frame_rate;
         bool debug;
+        std::string video_path;
+        int width_px = 0;
+        int height_px = 0;
+        int frame_rate = 0;
 
         // GST attributes
         GstElement *pipeline = nullptr;
@@ -118,7 +118,7 @@ class CSICamera : public Camera {
             }
             if (video_path.empty() ) {
                 std::cout << "ERROR: video_path attribute not found" << std::endl;
-                std::cout << "Setting video_path to default value: " << DEFAULT_INPUT_SOURCE << std::endl;
+                std::cout << "Setting video_path to default value: " << DEFAULT_INPUT_SENSOR << std::endl;
                 video_path = DEFAULT_INPUT_SENSOR;
             }
 
