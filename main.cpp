@@ -64,10 +64,10 @@ int serve(const std::string& socket_path) {
 
 
 int main(int argc, char *argv[]) {
+    std::cout << "### STARTING VIAM CSI CAMERA MODULE" << std::endl;
+
     // Gstreamer initialization
     gst_init(&argc, &argv);
-
-    std::cout << "STARTING VIAM CSI CAMERA MODULE" << std::endl;
     
     std::string sock_path = (argc < 2) ? DEFAULT_SOCKET_PATH : argv[1];
     std::cout << "binary:" << argv[0] << std::endl;

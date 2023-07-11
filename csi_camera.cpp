@@ -17,10 +17,10 @@ class CSICamera : public Camera {
     private:
         // Camera attributes
         bool debug;
-        std::string video_path;
         int width_px = 0;
         int height_px = 0;
         int frame_rate = 0;
+        std::string video_path;
 
         // GST attributes
         GstElement *pipeline = nullptr;
@@ -128,28 +128,6 @@ class CSICamera : public Camera {
                     debug = debug_bool;
                 }
             }
-        }
-
-        // GETTERS
-
-        std::string get_video_path() const {
-            return video_path;
-        }
-
-        int get_width_px() const {
-            return width_px;
-        }
-
-        int get_height_px() const {
-            return height_px;
-        }
-
-        int get_frame_rate() const {
-            return frame_rate;
-        }
-
-        bool is_debug() const {
-            return debug;
         }
 
         // OVERRIDE
@@ -435,5 +413,39 @@ class CSICamera : public Camera {
             std::vector<unsigned char> bytes(std::istreambuf_iterator<char>(file), {});
 
             return bytes;
+        }
+
+        // GETTERS
+
+        std::string get_video_path() const {
+            return video_path;
+        }
+
+        int get_width_px() const {
+            return width_px;
+        }
+
+        int get_height_px() const {
+            return height_px;
+        }
+
+        int get_frame_rate() const {
+            return frame_rate;
+        }
+
+        bool is_debug() const {
+            return debug;
+        }
+
+        GstElement* get_appsink() const {
+            return appsink;
+        }
+        
+        GstElement* get_pipeline() const {
+            return pipeline;
+        }
+
+        GstBus* get_bus() const {
+            return bus;
         }
 };
