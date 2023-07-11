@@ -98,13 +98,24 @@ RUN cd ${HOME}/opt/src && \
     cd appimage-builder && \
     pip3 install ./
 
-# Install viam-csi
+# Install GStreamer
 RUN apt-get install -y \
     libgstreamer1.0-dev \
-    libgstreamer-plugins-base1.0-dev \
-    libgstreamer-plugins-bad1.0-dev \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly \
-    gstreamer1.0-tools
+    gstreamer1.0-tools \
+    gstreamer1.0-x
+# Install GTest
+RUN apt-get -y install libgtest-dev
+RUN cd /usr/src/gtest && \
+    cmake CMakeLists.txt && \
+    make && \
+    cp *.a /usr/lib
+
+# Install viam-csi
+RUN apt-get -y install libfuse-dev
 ADD ../ /root/opt/src/viam-csi
 RUN cd ${HOME}/opt/src && \
     cd viam-csi && \
