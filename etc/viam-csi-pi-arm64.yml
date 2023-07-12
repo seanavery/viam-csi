@@ -37,12 +37,15 @@ AppDir:
     - libunwind8:arm64
   files:
     include:
-    - /usr/lib/aarch64-linux-gnu/libgst*
-    - /usr/local/lib/libviamsdka*
-    - /usr/local/lib/libviam_rust*
-    - /usr/local/lib/libgrpc*
-    - /usr/local/lib/libasl*
-    - /usr/local/lib/libproto*
+    - gstreamer1.0-x
+    - gstreamer1.0-alsa
+    - gstreamer1.0-plugins-base
+    - gstreamer1.0-plugins-good
+    - gstreamer1.0-plugins-bad
+    - gstreamer1.0-plugins-ugly
+    - gstreamer1.0-pulseaudio
+    - /usr/local/lib/libprotobuf.so.32
+    - /usr/local/lib/libviamsdk.so.noabi
 
 AppImage:
   arch: aarch64
