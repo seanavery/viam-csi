@@ -5,4 +5,5 @@ etc/AppDir
 etc/appimage-build
 *.AppImage*
 *.tar*
+*.swp
 **/.DS_Store
