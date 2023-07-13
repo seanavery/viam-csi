@@ -32,23 +32,14 @@ class CSICamera : public Camera {
 
         // Pipeline
         std::string input_source;
+        std::string input_format;
+        std::string video_convert;
         std::string output_encoder;
     
     public:
         explicit CSICamera(std::string name, AttributeMap attrs) : Camera(std::move(name)) {
-            // Get device type
-            device_type device = get_device_type();
-            if (device == device_type::unknown) {
-                std::cout << "ERROR: device type unknown" << std::endl;
-                input_source = DEFAULT_INPUT_SOURCE;
-                output_encoder = DEFAULT_OUTPUT_ENCODER;
-            } else if (device == device_type::jetson) {
-                input_source = JETSON_INPUT_SOURCE;
-                output_encoder = JETSON_OUTPUT_ENCODER;
-            } else if (device == device_type::pi) {
-                input_source = PI_INPUT_SOURCE;
-                output_encoder = PI_OUTPUT_ENCODER;
-            }
+            // Device specific attributes
+            fill_device_type();
 
             // Validate attributes
             validate_attrs(attrs);
@@ -61,6 +52,28 @@ class CSICamera : public Camera {
             
             // Start GST pipeline
             init_csi(pipeline_args);
+        }
+
+        void fill_device_type() {
+            // Get device type
+            device_type device = get_device_type();
+            if (device == device_type::unknown) {
+                std::cout << "ERROR: device type unknown" << std::endl;
+                input_source = DEFAULT_INPUT_SOURCE;
+                input_format = DEFAULT_INPUT_FORMAT;
+                video_convert = DEFAULT_VIDEO_CONVERT;
+                output_encoder = DEFAULT_OUTPUT_ENCODER;
+            } else if (device == device_type::jetson) {
+                input_source = JETSON_INPUT_SOURCE;
+                input_format = JETSON_INPUT_FORMAT;
+                video_convert = JETSON_VIDEO_CONVERT;
+                output_encoder = JETSON_OUTPUT_ENCODER;
+            } else if (device == device_type::pi) {
+                input_source = PI_INPUT_SOURCE;
+                input_format = PI_INPUT_FORMAT;
+                video_convert = PI_VIDEO_CONVERT;
+                output_encoder = PI_OUTPUT_ENCODER;
+            }
         }
 
         void validate_attrs(AttributeMap attrs) {
@@ -209,7 +222,9 @@ class CSICamera : public Camera {
 
             // Print pipeline structure
             if (debug) {
-                GST_DEBUG_BIN_TO_DOT_FILE(GST_BIN(pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "pipeline_structure");
+                GString* dot_data = gst_debug_bin_to_dot_data(GST_BIN(pipeline), GST_DEBUG_GRAPH_SHOW_ALL);
+                std::cout << dot_data->str << std::endl;
+                g_string_free(dot_data, TRUE);
             }
             
             // Fetch the appsink element
@@ -367,18 +382,32 @@ class CSICamera : public Camera {
         std::string create_pipeline() {
             std::ostringstream oss;
 
-            oss << input_source << " sensor_id=" << video_path
-                << " ! " << DEFAULT_INPUT_FORMAT
+            // oss << input_source << " sensor_id=" << video_path
+            //     << " ! " << DEFAULT_INPUT_FORMAT
+            //     << ",width=" << std::to_string(width_px)
+            //     << ",height=" << std::to_string(height_px)
+            //     << ",framerate=" << std::to_string(frame_rate)
+            //     << "/1 ! nvvidconv flip-method=" << DEFAULT_INPUT_FLIP_METHOD
+            //     << " ! " << DEFAULT_OUTPUT_FORMAT
+            //     << ",width=" << std::to_string(DEFAULT_OUTPUT_WIDTH)
+            //     << ",height=" << std::to_string(DEFAULT_OUTPUT_HEIGHT)
+            //     << " ! " << output_encoder
+            //     << " ! " << DEFAULT_OUTPUT_MIMETYPE
+            //     << " ! appsink name=appsink0 max-buffers=1";
+
+            oss << input_source 
+                << " ! " << input_format
                 << ",width=" << std::to_string(width_px)
                 << ",height=" << std::to_string(height_px)
                 << ",framerate=" << std::to_string(frame_rate)
-                << "/1 ! nvvidconv flip-method=" << DEFAULT_INPUT_FLIP_METHOD
+                << "/1 ! << " << video_convert
                 << " ! " << DEFAULT_OUTPUT_FORMAT
                 << ",width=" << std::to_string(DEFAULT_OUTPUT_WIDTH)
                 << ",height=" << std::to_string(DEFAULT_OUTPUT_HEIGHT)
                 << " ! " << output_encoder
                 << " ! " << DEFAULT_OUTPUT_MIMETYPE
-                << " ! appsink name=appsink0 max-buffers=1";
+                << " ! appsink name=" << DEFAULT_APPSINK_NAME 
+                <<  " max-buffers=" << std::to_string(DEFAULT_MAX_BUFFERS);
 
             return oss.str();
         }

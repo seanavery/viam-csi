@@ -4,7 +4,7 @@ INSTALL_DIR := $(BUILD_DIR)/AppDir
 BIN_DIR := ./bin
 
 # Docker
-IMAGE_NAME := viam-csi
+IMAGE_NAME := viam-csi-pi
 IMAGE_TAG := 0.0.2
 L4T_VERSION := 35.3.1
 
@@ -53,7 +53,7 @@ bin-module:
 	mkdir -p $(BIN_DIR) && \
 	docker stop viam-csi-bin | true && \
 	docker rm viam-csi-bin | true && \
-	docker run -d -it --name viam-csi-bin $(IMAGE_NAME):$(IMAGE_TAG) && \
+	docker run -d -it --name viam-csi-bin $(IMAGE_NAME)-pi:$(IMAGE_TAG) && \
 	docker cp viam-csi-bin:/root/opt/src/viam-csi/etc/viam-csi-$(IMAGE_TAG)-aarch64.AppImage $(BIN_DIR) && \
 	docker cp viam-csi-bin:/root/opt/src/viam-csi/build/viam-csi $(BIN_DIR) && \
 	docker stop viam-csi-bin
