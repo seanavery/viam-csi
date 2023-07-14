@@ -17,9 +17,24 @@ int main() {
     vs::Credentials credentials("");
     vs::DialOptions dial_options;
     dial_options.set_allow_insecure_downgrade(credentials.payload().empty());
-
     vs::Options options = vs::Options(1, dial_options);
 
+    std::shared_ptr<vs::RobotClient> robot;
+    try {
+        robot = vs::RobotClient::at_address(robot_address, options);
+        std::cout << "Successfully connected to the robot" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to connect to the robot. Exiting." << std::endl;
+        throw;
+    }
+
+
     // Get camera resource
+    std::vector<vs::ResourceName>* resource_names = robot->resource_names();
+    std::cout << "Resources of the robot:" << std::endl;
+    for (vs::ResourceName resource : *resource_names) {
+        std::cout << " - " << resource.name() << " (" << resource.subtype() << ")" << std::endl;
+    }
+
     return EXIT_SUCCESS;
 }
