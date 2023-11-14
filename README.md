@@ -4,11 +4,11 @@
 ![](./etc/viam-server.png)
 
 
-> **Warning** Currently in ALPHA and only supports Jetson. Please open an issue if you run into problems.
+> **Warning** Currently in ALPHA and only supports Jetson boards. Please open an issue if you run into problems.
 
 ___
 
-### why?
+## Purpose
 
 Want to use CSI cameras with viam? This is the module for you.
 
@@ -20,24 +20,77 @@ ISPs are hard, so why roll your own? There are great libraries out there like [l
 
 ___
 
-### usage
+## Usage
 
-1. Download appimage from releases page.
-```bash
-sudo wget https://github.com/seanavery/viam-csi/releases/download/v0.0.2/viam-csi-0.0.2-aarch64.AppImage -O /usr/local/bin/viam-csi
+To use this module, follow these instructions to [add a module from the Viam Registry](https://docs.viam.com/registry/configure/#add-a-modular-resource-from-the-viam-registry) and select the `viam:camera:csi` model from the [`csi-cam` module](https://app.viam.com/module/viam/csi-cam).
+
+## Configure your CSI camera
+
+> [!NOTE]  
+> Before configuring your camera, you must [create a robot](https://docs.viam.com/manage/fleet/robots/#add-a-new-robot).
+
+Navigate to the **Config** tab of your robot’s page in [the Viam app](https://app.viam.com/). Click on the **Components** subtab and click **Create component**. Select the `camera` type, then select the `csi` model. Enter a name for your camera and click **Create**.
+
+On the new component panel, copy and paste the following attribute template into your camera's **Attributes** box. 
+```json
+{
+  "width_px": <int>,
+  "height_px": <int>,
+  "frame_rate": <int>,
+  "debug": <bool>
+}
 ```
 
-```bash
-sudo chmod 755 /usr/local/bin/viam-csi
+> [!NOTE]  
+> For more information, see [Configure a Robot](https://docs.viam.com/manage/configuration/).
+
+Edit the attributes as applicable and save your config.
+In the **Control** tab of the [Viam app](https://app.viam.com/), you can now view the camera feed. 
+If you do not see anything, check the logs tab for errors.
+
+### Attributes
+
+The following attributes are available for `viam:camera:csi` cameras:
+
+<!-- prettier-ignore -->
+| Name | Type | Inclusion | Description |
+| ---- | ---- | --------- | ----------- |
+| `width_px` | int | Optional | Width of the image this camera captures in pixels. <br> Default: `1920` |
+| `height_px` | int | Optional | Height of the image this camera captures in pixels. <br> Default: `1080` |
+| `frame_rate` | int | Optional | The image capture frame rate this camera should use. <br> Default: `30` |
+| `video_path` | string | Optional | The filepath to the input sensor of this camera on your board. If none is given, your robot will attempt to detect the video path automatically. <br> Default: `"0"` </br>  |
+| `debug` | boolean | Optional | Whether or not you want debug input from this camera in your robot's logs. <br> Default: `false` |
+
+### Example Configuration
+
+```json
+{
+  "modules": [
+    {
+      "executable_path": "/usr/local/bin/viam-csi",
+      "name": "csi_cam_module"
+    }
+  ],
+  "components": [
+    {
+      "model": "viam:camera:csi",
+      "attributes": {
+        "width_px": 1920,
+        "height_px": 1080,
+        "frame_rate": 30,
+        "debug": true
+      },
+      "depends_on": [],
+      "name": "csicam_test",
+      "namespace": "rdk",
+      "type": "camera"
+    }
+  ]
+}
 ```
-
-2. Run [viam-server](https://docs.viam.com/installation/) with example config file [etc/app-config.json](https://github.com/seanavery/viam-csi/blob/master/etc/app-config.json).
-
-`viam-server` will automatically load the module. You can now head over to https://app.viam.com/ and view the control tab for the camera feed. If you do not see anything, check the logs tab for errors.
-
 ___
 
-### support
+### Support
 
 Check [SUPPORT.md](./doc/SUPPORT.md) for a more comprehensive list of tested setups.
 - [x] jetson
